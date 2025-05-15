@@ -29,12 +29,14 @@ public class UserDetailsImpl implements UserDetailsService {
   private BCryptPasswordEncoder encoder;
 
   @Autowired
-  public UserDetailsImpl(UserRepo userRepo, RoleRepo roleRepo, BCryptPasswordEncoder encoder) {
+  public UserDetailsImpl(UserRepo userRepo, RoleRepo roleRepo, BCryptPasswordEncoder encoder,
+      Collection<? extends GrantedAuthority> authorities) {
     this.userRepo = userRepo;
     this.roleRepo = roleRepo;
     this.encoder = encoder;
 
   }
+
   @Override
   public User findByUsername(String username) {
     return userRepo.findByUsername(username).get();
@@ -42,15 +44,14 @@ public class UserDetailsImpl implements UserDetailsService {
 
   @Override
   public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-
     User tempUser = findByUsername(username);
 
     if (tempUser == null) {
-      throw new UsernameNotFoundException("USERNAME İS NOT FOUND...");
+      throw new UsernameNotFoundException("USERNAME IS NOT FOUND...");
     }
-    return new org.springframework.security.core.userdetails.User(tempUser.getUsername(), tempUser.getPassword(),
-        mapToAuthorities(tempUser.getRoles()));
 
+    // Burada artık CustomUserDetails dönüyoruz!
+    return new CustomUserDetails(tempUser);
   }
 
   @Override
@@ -70,7 +71,7 @@ public class UserDetailsImpl implements UserDetailsService {
           // Var olan bir rolü al
           Optional<Role> existingRole = roleRepo.findByName(role.getName());
           if (existingRole.isPresent()) {
-              updatedRoles.add(existingRole.get()); // Var olan rolü ekle
+            updatedRoles.add(existingRole.get()); // Var olan rolü ekle
           }
         } else {
           // Yeni bir rolse, oluştur
@@ -79,7 +80,7 @@ public class UserDetailsImpl implements UserDetailsService {
             updatedRoles.add(existingRole.get()); // Var olan rolü ekle
           } else {
             // Eğer yeni rolse, kaydet
-            Role newRole = roleRepo.save(role );
+            Role newRole = roleRepo.save(role);
             updatedRoles.add(newRole);
           }
         }

@@ -13,23 +13,10 @@ public class DemoApplication {
 	
 			SpringApplication.run(DemoApplication.class, args);
 			BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
-			boolean a = encoder.matches("enes123",
-					"$2a$10$PIiUCZZh7p8HQjIQwqfPOuB5DCZ/tecqsblON00tp2scwpGbkTk8y");
+			boolean a = encoder.matches("test123",
+					"$2a$10$Eig/Y4iKPihYplx3WK7ZMeuSHtx6Gj9ybEb4JcAR997qgXHUa4S.y");
 			System.out.println(a);
 	
-						
-			//  User user = repo.findByEmail("eogemir@gmail.com").get();
-
-		// User user2 = repo.findByUsername("hakan").get();
-
-		// User user3 = repo.findByResetToken("null").get();
-
-		// System.out.println(user2 + " \n");+
-
-		// System.out.println(user + " \n");
-
-		// System.out.println(user3 + " \n");
-
 	}
 
 }

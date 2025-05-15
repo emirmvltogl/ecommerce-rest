@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,49 +14,54 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
 import com.example.demo.model.Product;
 import com.example.demo.service.ProductService;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/products")
 public class ProductController {
 
+  @Autowired
   private ProductService productService;
 
-  @Autowired
-  public ProductController(ProductService productService) {
-    this.productService = productService;
+  // ─── PUBLIC ──────────────────────────────────────────────────
+
+  @GetMapping
+  public ResponseEntity<List<Product>> listAll() {
+    return ResponseEntity.ok(productService.getAllData());
   }
 
-  @GetMapping("/products")
-  public ResponseEntity<List<Product>> getAllData() {
-    return new ResponseEntity<>(productService.getAllData(), HttpStatus.OK);
+  @GetMapping("/{id}")
+  public ResponseEntity<Product> getOne(@PathVariable Long id) {
+    return ResponseEntity.ok(productService.findProductById(id));
   }
 
-  @GetMapping("/products/{id}")
-  public ResponseEntity<Product> getProduct(@PathVariable int id) {
-    return new ResponseEntity<>(productService.findProductById(id), HttpStatus.OK);
+  // ─── MANAGER ──────────────────────────────────────────────────
+
+  @PreAuthorize("hasRole('MANAGER')")
+  @PostMapping
+  public ResponseEntity<Product> create(@RequestBody Product p) {
+    return new ResponseEntity<>(productService.createProduct(p), HttpStatus.CREATED);
   }
 
-  @PostMapping("/products")
-  public ResponseEntity<Product> createProduct(@RequestBody Product product) {
-    return new ResponseEntity<>(productService.createProduct(product), HttpStatus.CREATED);
+  @PreAuthorize("hasRole('MANAGER')")
+  @PutMapping("/{id}")
+  public ResponseEntity<Product> update(@PathVariable Long id,
+      @RequestBody Product p) {
+    return ResponseEntity.ok(productService.updateProduct(id, p));
   }
 
-  @PutMapping("/products/{id}")
-  public ResponseEntity<Product> updateProduct(@PathVariable int id, @RequestBody Product theProduct) {
-    return new ResponseEntity<>(productService.updateProduct(id, theProduct), HttpStatus.OK);
-  }
+  // ─── ADMIN ────────────────────────────────────────────────────
 
-  @DeleteMapping("/products/{id}")
-  public ResponseEntity<String> deleteProduct(@PathVariable int id) {
-    Product deletingProduct = productService.findProductById(id);
-    if (deletingProduct == null) {
-      return new ResponseEntity<>("product id is not found : " + id, HttpStatus.NOT_FOUND);
+  @PreAuthorize("hasRole('MANAGER')")
+  @DeleteMapping("/{id}")
+  public ResponseEntity<String> delete(@PathVariable Long id) {
+    if (productService.findProductById(id) == null) {
+      return ResponseEntity.status(HttpStatus.NOT_FOUND)
+          .body("product id not found: " + id);
     }
     productService.deleteProduct(id);
-
-    return new ResponseEntity<>("deleted produt : " + id, HttpStatus.OK);
+    return ResponseEntity.ok("deleted product: " + id);
   }
-
 }

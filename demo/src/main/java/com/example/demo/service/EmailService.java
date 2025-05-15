@@ -1,6 +1,7 @@
 package com.example.demo.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
@@ -10,29 +11,37 @@ import jakarta.mail.internet.MimeMessage;
 
 @Service
 public class EmailService {
-  
-  private JavaMailSender mailSender;
 
-  @Autowired
-  public EmailService(JavaMailSender mailSender) {
-    this.mailSender = mailSender;
-  }
+    private final JavaMailSender mailSender;
 
+    @Value("${spring.mail.username}")
+private String from;
 
-  public void mailSend(String recipientEmail, String resetToken) {
-    try {
-        MimeMessage message = mailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(message, true);
-
-        helper.setFrom("eogemir@gmail.com");
-        helper.setTo(recipientEmail); // Bu satır null olmamalı
-        helper.setSubject("Parola Sıfırlama İsteği");
-        helper.setText("Parola sıfırlama linkiniz: http://localhost:8080/pas/reset?token=" + resetToken, true);
-
-        mailSender.send(message);
-    } catch (MessagingException e) {
-        throw new IllegalStateException("E-posta gönderimi başarısız oldu", e);
+    @Autowired
+    public EmailService(JavaMailSender mailSender) {
+        this.mailSender = mailSender;
+        this.from=from;
     }
-}
+
+    public void mailSend(String to, String token) {
+        String subject = "Şifre Sıfırlama Bağlantınız";
+        String resetUrl = "http://localhost:3000/reset-password?token=" + token;
+        String body = "Şifrenizi sıfırlamak için aşağıdaki bağlantıya tıklayın:\n\n" + resetUrl;
+
+        try {
+            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(message, true);
+
+            helper.setFrom(from);
+            helper.setTo(to);
+            helper.setSubject(subject);
+            helper.setText(body, false);
+
+            mailSender.send(message);
+            System.out.println("Mail başarıyla gönderildi: " + to);
+        } catch (MessagingException e) {
+            System.err.println("Mail gönderme hatası: " + e.getMessage());
+        }
+    }
 
 }
