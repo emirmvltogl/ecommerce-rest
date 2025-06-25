@@ -78,10 +78,11 @@ public class SecurityConfig {
                         // --- ADMIN ROLÜ (silme ve kullanıcı yönetimi)
                         .requestMatchers(HttpMethod.GET, "/api/user/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/user/register").hasRole("ADMIN")
-                        
                         .requestMatchers(HttpMethod.POST,"/api/user/default").permitAll()
                         .requestMatchers(HttpMethod.GET,"/api/cart/").authenticated()
                         .requestMatchers(HttpMethod.POST,"/api/cart/add").authenticated()
+                        .requestMatchers(HttpMethod.POST,"/api/cart/checkout").authenticated()
+                        .requestMatchers(HttpMethod.GET,"/api/admin/orders").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE,"/api/cart/remove/**").authenticated()
                         .requestMatchers(HttpMethod.DELETE,"/api/cart/clear").authenticated()
 
@@ -106,9 +107,8 @@ public class SecurityConfig {
 
     @Bean
     public JwtFilter jwtFilter(
-            AuthenticationManager authManager,
             JwtUtil jwtUtil,
             UserDetailsService userDetailsService) {
-        return new JwtFilter(authManager, jwtUtil, userDetailsService);
+        return new JwtFilter(jwtUtil, userDetailsService);
     }
 }

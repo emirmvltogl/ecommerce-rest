@@ -2,7 +2,6 @@ package com.example.demo.security;
 
 import java.io.IOException;
 
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -24,12 +23,9 @@ public class JwtFilter extends OncePerRequestFilter {
 
   private UserDetailsService userDetailsService;
 
-  private final AuthenticationManager authenticationManager;
 
   // Constructor injection of dependencies
-  public JwtFilter(AuthenticationManager authenticationManager, JwtUtil jwtUtil,
-      UserDetailsService userDetailsService) {
-    this.authenticationManager = authenticationManager;
+  public JwtFilter(JwtUtil jwtUtil,UserDetailsService userDetailsService) {
     this.jwtUtil = jwtUtil;
     this.userDetailsService = userDetailsService;
   }

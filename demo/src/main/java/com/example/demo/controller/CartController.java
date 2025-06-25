@@ -20,6 +20,7 @@ import com.example.demo.dto.CartResponse;
 import com.example.demo.model.Cart;
 import com.example.demo.model.User;
 import com.example.demo.service.CartService;
+import com.example.demo.service.OrderService;
 import com.example.demo.service.UserDetailsService;
 
 @RestController
@@ -29,11 +30,13 @@ public class CartController {
     private final CartService cartService;
     private final UserDetailsService userService;
     private static final Logger logger = LoggerFactory.getLogger(CartController.class);
+    private final OrderService orderService;
 
     @Autowired
-    public CartController(CartService cartService, UserDetailsService userService) {
+    public CartController(CartService cartService, UserDetailsService userService, OrderService orderService) {
         this.cartService = cartService;
         this.userService = userService;
+        this.orderService = orderService;
     }
 
     // Kullanıcının sepetini al ve göster
@@ -85,7 +88,6 @@ public class CartController {
     }
 
     // Sepetten ürün çıkarma
-    // Sepetten ürün çıkarma
     @DeleteMapping("/remove/{productId}")
     public ResponseEntity<CartResponse> removeFromCart(
             @AuthenticationPrincipal UserDetails userDetails,
@@ -121,4 +123,28 @@ public class CartController {
         CartResponse response = new CartResponse(cart, cart.getTotalPrice());
         return ResponseEntity.ok(response);
     }
+
+    @PostMapping("/checkout")
+    public ResponseEntity<String> checkout(@AuthenticationPrincipal UserDetails userDetails) {
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Kullanıcı girişi yapılmamış");
+        }
+
+        User user = userService.findByUsername(userDetails.getUsername());
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Kullanıcı bulunamadı");
+        }
+
+        Cart cart = cartService.getCartByUser(user);
+        if (cart.getItems().isEmpty()) {
+            return ResponseEntity.badRequest().body("Sepet boş");
+        }
+
+        orderService.createOrderFromCart(cart); // Siparişi oluştur
+        cartService.clearCart(user); // Sepeti temizle
+
+        return ResponseEntity.ok("Satın alma işlemi tamamlandı!");
+    }
+
+
 }

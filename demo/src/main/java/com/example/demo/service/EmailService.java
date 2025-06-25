@@ -15,12 +15,12 @@ public class EmailService {
     private final JavaMailSender mailSender;
 
     @Value("${spring.mail.username}")
-private String from;
+    private String from;
 
     @Autowired
     public EmailService(JavaMailSender mailSender) {
         this.mailSender = mailSender;
-        this.from=from;
+        this.from = from;
     }
 
     public void mailSend(String to, String token) {

@@ -87,3 +87,23 @@ CREATE TABLE `cart_item` (
   FOREIGN KEY (`product_id`) REFERENCES `products`(`id`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+
+-- orders tablosunu oluştur
+CREATE TABLE `orders` (
+  `id` BIGINT(11) AUTO_INCREMENT PRIMARY KEY,
+  `user_id` BIGINT(11) NOT NULL,
+  `total_price` DECIMAL(10,2) NOT NULL,
+  `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (`user_id`) REFERENCES `user`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- order_item tablosunu oluştur
+CREATE TABLE `order_item` (
+  `id` BIGINT(11) AUTO_INCREMENT PRIMARY KEY,
+  `order_id` BIGINT(11) NOT NULL,
+  `product_id` BIGINT(11) NOT NULL,
+  `quantity` INT NOT NULL CHECK (quantity > 0),
+  `price` DECIMAL(10,2) NOT NULL,
+  FOREIGN KEY (`order_id`) REFERENCES `orders`(`id`) ON DELETE CASCADE,
+  FOREIGN KEY (`product_id`) REFERENCES `products`(`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

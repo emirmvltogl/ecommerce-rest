@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.demo.model.User;
+import com.example.demo.service.ReportService;
 import com.example.demo.service.UserDetailsService;
 
 @RestController
@@ -23,6 +24,9 @@ public class UserController {
 
   @Autowired
   private UserDetailsService userService;
+
+  @Autowired
+  private ReportService reportService;
 
   // ─── ADMIN ────────────────────────────────────────────────────
 
@@ -41,7 +45,6 @@ public class UserController {
     return new ResponseEntity<>(userService.saveUser(u), HttpStatus.CREATED);
   }
 
-  // Eğer “default” register da ADMIN’e bağlı kalacaksa:
   @PostMapping("/default")
   public ResponseEntity<User> registerDefault(@RequestBody User u) {
     return new ResponseEntity<>(userService.saveDefaultUser(u), HttpStatus.CREATED);

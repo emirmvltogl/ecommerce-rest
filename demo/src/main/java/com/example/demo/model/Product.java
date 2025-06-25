@@ -12,28 +12,28 @@ import jakarta.persistence.Table;
 
 public class Product {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  @Column(name = "id")
-  private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
+    private Long id;
 
-  @Column(name = "product_name")
-  private String productName;
+    @Column(name = "product_name")
+    private String productName;
 
-  @Column(name = "price")
-  private int price;
+    @Column(name = "price")
+    private int price;
 
-  @Column(name = "url")
-  private String url;
+    @Column(name = "url")
+    private String url;
 
-  public Product(String productName, int price, String url) {
-    this.productName = productName;
-    this.price = price;
-    this.url = url;
-  }
+    public Product(String productName, int price, String url) {
+        this.productName = productName;
+        this.price = price;
+        this.url = url;
+    }
 
-  public Product() {
-  }
+    public Product() {
+    }
 
     public Long getId() {
         return id;
@@ -50,7 +50,6 @@ public class Product {
     public void setProductName(String productName) {
         this.productName = productName;
     }
-
 
     public int getPrice() {
         return price;
@@ -70,10 +69,8 @@ public class Product {
 
     @Override
     public String toString() {
-      return "Product [id=" + id + ", productName=" + productName + ", price=" + price + ", url="
-          + url + "]";
+        return "Product [id=" + id + ", productName=" + productName + ", price=" + price + ", url="
+                + url + "]";
     }
-
-  
 
 }
