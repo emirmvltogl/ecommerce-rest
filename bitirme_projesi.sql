@@ -11,6 +11,8 @@ DROP TABLE IF EXISTS `users_roles`;
 DROP TABLE IF EXISTS `products`;
 DROP TABLE IF EXISTS `cart`;
 DROP TABLE IF EXISTS `cart_item`;
+DROP TABLE IF EXISTS `orders`;
+DROP TABLE IF EXISTS `order_item`;
 
 -- Yabancı anahtar denetimlerini tekrar aç
 SET foreign_key_checks = 1;
